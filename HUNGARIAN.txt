@@ -1,0 +1,161 @@
+Hungarian Notation | Definition | Example
+
+[Types]
+b   | unsigned 8-bit integer   | bCapital = 32; cToggleCapital ^= bCapital;
+sb  | signed 8-bit integer     | sbNegative = -1; return sbNegative;
+----------
+c   | signed 8-bit character   | cSpace = ' '; memset(bufSpace, cSpace, cbSpace);
+uc  | unsigned 8-bit char      | ucExtended = 168; bufSpace[cbSpace-1] = ucExtended;
+----------
+ush | unsigned 16-bit integer  | wMaxUShort = 0xFFFF;
+sh  | signed 16-bit integer    | shMaxShort = 0x7FFF;
+----------
+i   | signed 32-bit integer    | iMaxInt = 0x7FFFFFFF;
+u   | unsigned 32-bit integer  | uiMaxUInt = 0xFFFFFFFF;
+----------
+l   | signed 64-bit integer    | lMaxLong = 0x7FFFFFFFFFFFFFFF;
+ul  | unsigned 64-bit integer  | ulMaxULong = 0xFFFFFFFFFFFFFFFF;
+----------
+f  | signed 32-bit float       | fScale = 0.75f;
+d  | signed 64-bit double      | dScale = 1.25;
+----------
+a   | array; Used WITHOUT other Hungarian Notation. [eg. structs]   | aShooterGamesToPlay[5];
+p   | pointer; Used WITHOUT other Hungarian Notation                | pDoomGame = &(aShooterGamesToPlay[1]);
+pp  | pointer of a pointer. Used WITHOUT other Hungarian Notation   | ppDoomGame = &pDoomGame;
+vp  | void pointer. Used with void only                             | vpAddress = VirtualAlloc(...);
+a_  | array; Used with other Hungarian Notation                     | a_iTopScores[10];
+p_  | pointer; Used with other Hungarian Notation                   | p_cSpace = &cSpace;
+pp_ | pointer of a pointer; Used with other Hungarian Notation      | pp_cSpace = &p_cSpace;
+----------
+xmm_ | SIMD SSE 128-bit value. Used with other Hungarian Notation.  | __m128i xmm_iZero = _mm_setzero_si128();
+ymm_ | SIMD AVX 256-bit value. Used with other Hungarian Notation.  | __m256i ymm_iZero = _m256_setzero_si256();
+zmm_ | SIMD AVX 512-bit value. Used with other Hungarian Notation.  | __m512i zmm_iZero = _m512_setzero_si512();
+tmm_ | SIMD AMX 1024-bit value. Used with other Hungarian Notation. | __tile1024i tmm_iZero; __tile_zero(&tmm_iZero);
+
+[Structs]
+h    | Handle                             | hStdOut = GetStdOutput(STD_OUTPUT_HANDLE);
+----------
+buf  | Unmanaged Memory buffer            | memset(bufBack.vpAddr, ' ', bufBack.cbAddr);
+mem  | Managed Memory buffer              | MemLinearCreate(&memLinear, vp_Win32Addr, KB(4), sizeof(size_t));
+str  | Size-Recorded string, Ascii        | StrCreate(&strTest, "Hello, World!");
+utf  | Size-Recorded string, UTF encoded  | Utf8Create(&utfTest, "Hello, World!");
+pos  | Position in 2D or 3D space         | GetCursorPosition(&posCursor);
+vec  | Vector                             | GetTranslationVector(&vecPos, p_matCharacter); 
+mat  | Matrix                             | Inverse(&matOut, p_matToUse);
+
+[Purpose]
+cb   | Count in Bytes. For Objects only             | a_iPixels[1024]; cbPixels = 4096; 
+ct   | Count in General. For Objects or Concepts    | ctLives = 3; ctPixels = 1024;
+fl   | Flags                                        | flCapitalCStr = 0x20;
+sz   | zero-terminated c string                     | szMsg = "Hello, World!" [szMsg[13] == '\0']
+g_   | Global                                       | g_memGlobal;
+E_   | Enum Value for Error Codes                   | E_SOMESTRUCT_SUCCESS = 0,
+
+[Boolean]
+is                 | An Integer describing current iteration.  | isPlayerDead = 0;
+was                | An Integer describing past iteration.     | wasItemPickedUp = 1;
+has                | An Integer describing current aquisition. | hasSword = 1;
+had                | An Integer describing past aquisition.    | hadPotion = 1;
+use                | An Integer describing current usage.      | usePotion = 1;
+used               | An Integer describing past usage.         | usedSword = 0;
+(Insert Verb Here) | (An Integer with Verb Description)        | 
+
+[Function]
+fn  | A Function Variable or Type. Use if function name is camelCase or UpperCase.
+fn_ | A Function Variable or Type. Use if function name is in lower_case.
+
+FAQ:
+Q: Why are you not using the standard hungarian notation?
+A: I dont like how some of the letters are used. For instance,
+   "b" should be byte (eg. system hungarian). however for applications
+   it means bool. Then there's "sz", which is a zero-terminated string.
+   Its awful when its a pointer "psz". After working with it so much,
+   I decided to make my own Hungarian notation and follow that. As I 
+   find problems with my noation I update it to accomodate.
+
+Q: How do you determine which hungarian to use?
+A: [Boolean] -> [Purpose] -> [Struct] -> [Type]. In that order.
+
+Q: You're missing [X] hungarian
+A: Good chance I just never needed to use that hungarian. Another good chance
+   is that I never came across it. If its something for C++, good chance I
+   won't use it. When I write C++ code, I keep it as "C" as possible.
+
+Q: Why is there an underscore when dealing with pointers and simd?
+A: I never liked things like "pszMsg", "piSelect". I realized its because the
+   combination of both pointer and other hungariang looks extremely ugly in
+   both the way it looks and how to process the word. "p_" is still ugly, but
+   processing it is way easier. eg. "p_szHelloWorld" vs "pszHelloWorld".
+
+   As for the SIMD, I am unaware of any hungarian notation on SIMD types
+   So, a simple test: "xmm_fVecDot1" "xmmfVecDot2". I prefer the underscore.
+   And of course, in regards to pointer, three tests were made:
+   "pxmmfVecAdd1" vs "p_xmm_fVecAdd2" vs "pxmm_fVecAdd3". The first one is too
+   noisy, the second one is too verbose, The last one I found it better than the
+   other two. This can change in the future, as its not set in stone.
+
+Q: Why is the void pointer so different? (eg. p_vBuffer and vp_Buffer is invalid)
+A: The first reason is to understand what the underscore ("_") is used for. It is
+   used to separate the pointer "p" from other hungarian notation. This alone
+   would negate "vp_AnyVariableName".
+
+   As for the other reason, it technically doesn't make any sense. "void" has no
+   size. So for example: "p_iLives" shows that it is a pointer to a 32-bit value.
+   "p_ctLives" shows that it is a pointer to some value, with a type, that is to 
+   be looked at as a counter instead of that specified type. Since void is
+   technically a type, Typing something like "p_vBuffer" states that it is a
+   pointer to a 0-bit value. How can you store a value with 0 bits? A more
+   charitible interpretation is that it is a pointer to an unknown bit value.
+   From there, it comes down to consistency. all types, except void, has bits
+   involved. It doesn't make any sense to bend that rule because of one type.
+   So it is being treated as a purpose instead of a type. What is the purpose
+   of a void pointer? It is to provide an address without any association to a
+   type. In case you missed it, this is exactly how void pointers are handled
+   in c. It is not in relationship to the data, unlike the other data types.
+   This is why "p_vVariableName" would be considered invalid in my Hungarian
+   Notation.
+
+Q: (In response to above): So what about fn and fn_? Why do they both exist?
+A: Truthfully, they are here for completion. This is a hungarian notation,
+   document, not a coding style. However, to indulge on the question, all
+   function typedefs and variables must have "fn" prepended. If I'm doing a
+   typedef, it must be written UpperCase. eg. "FnMemcpy". That is because
+   my structs and typedefs (of non-basic types) must be written UpperCase.
+   If I'm typing up a function, the function name must be lower_case.
+   eg. "fn_memcpy". If I'm typing up a procedure, it must be camelCase.
+   eg. "fnConsoleInit". For clarity sake, a function is a set of instructions.
+   focused on the manipulation of data without any involvement of a state
+   machine. So something like a memcpy would be a function, and an
+   initialization function from a library would be a procedure. The definition
+   can go more indepth, but for the purposes of this document and the project,
+   I shouldn't need to go further.
+
+Q: Eww. Hungarian Notation. Why not just name the variable in "X clean way"?
+A: Because naming variables like "canIHasBlueCheeseBurgerAfter12OClockInBed"
+   is way too cumbersome. I honestly hate today's "clean code", so don't
+   expect this from me. If you want "clean code", it would be done the right
+   way. What is the right way? Making it easier for dev to read without
+   impeding on both the compile time and run time. It also means you don't
+   rely on the compiler unless you know exactly what it is you're trying to
+   achieve.
+
+   I will use defines for constants and macros. I will use concise names
+   for my functions, structures, classes and variables. I will use the
+   hungarian notation to determine the type and pointer. I will type out
+   a complete thought in a function, refactoring when necessary. I will
+   type out 500+ line procedures, presuming no refactoring is necessary.
+   I will create cache tables when dealing with awful external libraries.
+   I will use goto when beneficial.
+
+   In essence, I will violate all those "Clean Code" Acronyms that makes
+   software disgusting to run. SOLID? out the window. DRY? Only when
+   necessary. SLAP? Slap that out of here. LSP? More like cpu LSD.
+   Being a software developer isn't supposed to be easy. Its supposed to
+   provide the best experience to the people that will be using your
+   software. This means harmonizing with the physical hardware and human
+   psychology, with the sofware engineer being the mediator between the two.
+   Closing and re-opening software should never be the solution to a problem.
+   It should be both extremely rare and a last resort. The state of todays
+   programs is abysmal, and its reflects on the sad state in today's
+   programming culture. I have a vision in where programs can be much better,
+   and I must be the example I want to put forth.

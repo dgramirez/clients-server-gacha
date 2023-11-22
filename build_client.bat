@@ -13,14 +13,14 @@ set FLG_RELEASE=/O2
 set FLG_DEBUG=/Od /Z7
 set FLG_GENERATE_INTRINSICS=/Oi
 
-set CFLAGS=/nologo /fp:fast /fp:except- /Gm- /GR- /EHa- /GS- /Gs214785647 /WX /W4 /diagnostics:caret /FC /DWIN32_LEAN_AND_MEAN
+set CFLAGS=/nologo /fp:fast /fp:except- /Gm- /GR- /EHa- /GS- /Gs214785647 /WX /W4 /diagnostics:caret /FC /DWIN32_LEAN_AND_MEAN %FLG_DEBUG%
 set CLINK=/SUBSYSTEM:WINDOWS /OUT:%OUT_ROOT%\%OUT_NAME% kernel32.lib User32.lib Ws2_32.lib
 
 echo.
 echo Compiling Client...
 echo.
 
-cl %CFLAGS% main.c /link %CLINK%
+cl %CFLAGS% main2.c /link %CLINK%
 
 if exist *.obj (del /s /q /f *.obj)
 popd

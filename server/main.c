@@ -5,6 +5,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <process.h>
+#include "sqlite/sqlite3.c"
 
 #define MSGLEN 512
 #define DEFAULT_PORT "27015"
@@ -273,8 +274,8 @@ server_shutdown(PPlatformINet pinet) {
 static void
 server_print(const char *msg) {
 	static DWORD written;
-	HANDLE stdout = GetStdHandle(STD_OUTPUT_HANDLE);
-	WriteConsole(stdout, msg, lstrlen(msg), &written, 0);
+	HANDLE stdoutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	WriteConsole(stdoutput, msg, lstrlen(msg), &written, 0);
 }
 
 static void
