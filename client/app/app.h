@@ -1,8 +1,7 @@
 #ifndef CSG_CLIENT_APP_H
 #define CSG_CLIENT_APP_H
 
-#include "user_input.h"
-#include "platform_to_app.h"
+#include "types/platform.h"
 
 #define MAX_FIELD_INDEX 32
 
@@ -40,10 +39,10 @@ typedef struct {
 	int8_t hasEscaped;
 } AppData, *P_AppData;
 
-static int
-appInit(void* vpAppData);
+CLIENT_API int
+appInit(void* vpAppData, P_FnMemory pFnMem);
 
-static int
+CLIENT_API int
 appUpdate(void* vpAppData,
           P_PlatformData pData);
 
@@ -60,12 +59,18 @@ appLogin(P_AppData pApp);
 
 // Render
 static int
-appRenderLogin(P_AppData pApp, char *pBackBuffer, size_t cbBackBuffer);
+appRenderLogin(P_AppData pApp,
+		       P_RenderBuffer pRender,
+               P_FnMemory pFnMem);
 
 // Note: Win32 Console acts so wonky, especially when '\0' is involved.
 //       This is created to avoid such an awful mess with it.
 static int
-appWriteLine(const char *cstrMsg, size_t ctMsg, char *bufBack);
+appWriteLine(const char *p_szMsg,
+             size_t cbMsg,
+			 P_RenderBuffer pRender,
+			 int iRenderOffset,
+			 P_FnMemory pFnMem);
 
 #endif // CSG_CLIENT_APP_H
 

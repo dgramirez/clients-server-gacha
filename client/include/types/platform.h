@@ -15,27 +15,17 @@ typedef struct {
 	FnMemory memFn;
 	RenderBuffer render;
 	InetBuffer inet;
+	size_t flags;
 
-	size_t *szBack;
-	char *bufBack;		// 1KB
-	                    //    - 2KB for whole buffer
-
-	size_t cbMsgSend;
-	char *bufMsgSend;
-
-	size_t cbMsgRecv;
-	char *bufMsgRecv;
-
-	// TODO: Thinking about this, This shouldn't be here.
-	//       At some point, remove this (and ALL win32 functions)
-	//       From the app.h and app.cxx files.
-	//
-	//       Supply a "platform-based" structure to the app's init
-	//       Function to provide things like memcpy, memset,
-	//       inet wakeup, etc.
-	CRITICAL_SECTION inetMutex; // Note: Yes, i know this isn't a mutex
-								//       For my purposes, it acts as such.
-	CONDITION_VARIABLE inetCondVar;
+//	size_t *szBack;
+//	char *bufBack;		// 1KB
+//	                    //    - 2KB for whole buffer
+//
+//	size_t cbMsgSend;
+//	char *bufMsgSend;
+//
+//	size_t cbMsgRecv;
+//	char *bufMsgRecv;
 } PlatformData, *P_PlatformData;
 
 #endif // CSG_CLIENT_PLATFORM_TO_APP_H

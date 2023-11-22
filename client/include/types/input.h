@@ -1,6 +1,9 @@
 #ifndef CSG_CLIENT_INCLUDE_TYPES_INPUT_H
 #define CSG_CLIENT_INCLUDE_TYPES_INPUT_H
 
+#include <stdint.h>
+#define MAX_USERINPUT 16
+
 typedef enum {
 	USERINPUT_IGNORE = 0,
 	USERINPUT_EVENT_VK,
