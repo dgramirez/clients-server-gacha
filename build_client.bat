@@ -6,10 +6,10 @@ if not defined lib (
 pushd client
 
 :: Setup all variables
-set OUT_NAME=client
 set OUT_ROOT=..\..\out
-set OUT_EXE=/OUT:%OUT_ROOT%\%OUT_NAME%.exe
-set OUT_DLL=/OUT:%OUT_ROOT%\%OUT_NAME%.dll
+set OUT_EXE=/OUT:%OUT_ROOT%\client.exe
+set OUT_APP=/OUT:%OUT_ROOT%\app.dll
+set OUT_CONSOLE=/OUT:..\%OUT_ROOT%\console.dll
 if not exist %OUT_ROOT% mkdir %OUT_ROOT%
 
 set FLG_RELEASE=/O2
@@ -19,24 +19,52 @@ set FLG_GENERATE_INTRINSICS=/Oi
 set DEF_DLL=/D CLIENT_API=__declspec(dllexport)
 set WIN32_LIBS=kernel32.lib User32.lib Ws2_32.lib
 
-set CFLAGS=/nologo /fp:fast /fp:except- /Gm- /GR- /EHa- /GS- /Gs214785647 /WX /W4 /diagnostics:caret /FC /DWIN32_LEAN_AND_MEAN %FLG_DEBUG% /I..\include
+set CFLAGS=/nologo /fp:fast /fp:except- /Gm- /GR- /EHa- /GS- /Gs214785647 /WX /W4 /diagnostics:caret /FC /DWIN32_LEAN_AND_MEAN %FLG_DEBUG%
 set CLINK=/SUBSYSTEM:WINDOWS
 
+:::::::::::::::::::::::
+::: Compile App DLL :::
+:::::::::::::::::::::::
 echo.
 echo Compiling Client App DLL...
 echo.
 
 pushd app
-cl %CFLAGS% %DEF_DLL% app.c /link /DLL %OUT_DLL%
+cl %CFLAGS% %DEF_DLL% /I..\include app.c /link /DLL %OUT_APP%
 popd
 
 if not "%ERRORLEVEL%" == "0" (
 echo.
 echo Compiling Client App DLL Failed!
 echo.
+
+goto done
 ) else (
 echo.
 echo Compiling Client App DLL Succeeded!
+echo.
+)
+
+:::::::::::::::::::::::
+::: Compile App DLL :::
+:::::::::::::::::::::::
+echo.
+echo Compiling Client Renderer (Console)...
+echo.
+
+pushd .\render\console
+cl %CFLAGS% %DEF_DLL% /I..\..\include render.c /link /DLL %OUT_CONSOLE%
+popd
+pause
+if not "%ERRORLEVEL%" == "0" (
+echo.
+echo Compiling Client Renderer (Console) Failed!
+echo.
+
+goto done
+) else (
+echo.
+echo Compiling Client Renderer (Console) Succeeded!
 echo.
 )
 

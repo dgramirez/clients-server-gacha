@@ -28,5 +28,8 @@ typedef struct {
 //	char *bufMsgRecv;
 } PlatformData, *P_PlatformData;
 
+typedef int (*FnAppInit)(void *, P_FnMemory);
+typedef int (*FnAppUpdate)(void *, P_PlatformData);
+
 #endif // CSG_CLIENT_PLATFORM_TO_APP_H
 

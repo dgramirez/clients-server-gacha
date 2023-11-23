@@ -49,6 +49,7 @@ ct   | Count in General. For Objects or Concepts    | ctLives = 3; ctPixels = 10
 fl   | Flags                                        | flCapitalCStr = 0x20;
 sz   | zero-terminated c string                     | szMsg = "Hello, World!" [szMsg[13] == '\0']
 g_   | Global                                       | g_memGlobal;
+e    | Error                                        | eRender = E_REND_FAIL_NULL_RENDER;
 E_   | Enum Value for Error Codes                   | E_SOMESTRUCT_SUCCESS = 0,
 
 [Boolean]
