@@ -4,15 +4,6 @@
 #include "types/surface.h"
 #include <windows.h>
 
-typedef struct {
-	// Threads
-	P_SystemFn pSysFn;
-	P_SurfaceBuffer pSurf;
-
-	CONDITION_VARIABLE cv;
-	CRITICAL_SECTION cs;
-} Win32Console, *P_Win32Console;
-
 CLIENT_API int
 expSurfaceInit(P_InitSurface pSurf, P_SystemFn pSysFn);
 

@@ -18,13 +18,6 @@ WinMain(HINSTANCE hInst,
 	size_t cbHeap;
 	BgMutex bgMutex;
 
-	// System Functions
-	sysFn.memcpy = win32Memcpy;
-	sysFn.memset = win32Memset;
-	sysFn.memcmp = win32Memcmp;
-	sysFn.memmove = win32Memmove;
-	sysFn.memzero = win32Memzero;
-
 	win32Memzero(&sysFn, sizeof(SystemFn));
 	win32Memzero(&app, sizeof(AppBuffer));
 	win32Memzero(&inet, sizeof(InetBuffer));
@@ -32,6 +25,13 @@ WinMain(HINSTANCE hInst,
 	win32Memzero(&bgThread, sizeof(BgThread));
 	win32Memzero(&bgEvent, sizeof(BgEvent));
 	win32Memzero(&bgMutex, sizeof(BgMutex));
+
+	// System Functions
+	sysFn.memcpy = win32Memcpy;
+	sysFn.memset = win32Memset;
+	sysFn.memcmp = win32Memcmp;
+	sysFn.memmove = win32Memmove;
+	sysFn.memzero = win32Memzero;
 
 	// Memory
 	cbHeap = KB(4);

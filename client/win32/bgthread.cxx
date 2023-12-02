@@ -164,10 +164,11 @@ Win32SurfaceInit(P_SurfaceBuffer pSurf, P_SystemFn pSysFn) {
 		return 4;
 
 	// TODO: Get Surface Configuration
+	//       This would be different between console & win32 window
 	initSurf.posX = 0;
 	initSurf.posY = 0;
-	initSurf.posW = 0;
-	initSurf.posH = 0;
+	initSurf.posW = 64;
+	initSurf.posH = 16;
 	eSurf = pSurf->fnInit(&initSurf, pSysFn);
 	if (eSurf)
 		return eSurf;
