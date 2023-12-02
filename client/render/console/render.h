@@ -1,19 +1,19 @@
 #ifndef CSG_CLIENT_RENDER_CONSOLE_RENDER_H
 #define CSG_CLIENT_RENDER_CONSOLE_RENDER_H
 
-#include "render/xform_render.h"
+#include "xform/render.h"
 
 CLIENT_API ERR_RENDER
-renderInit(P_XFormRender pRender);
+renderInit(P_XFormRender pRender, P_SystemFn pMemFn);
 
 CLIENT_API ERR_RENDER
-render(P_XFormRender pRender);
+render(P_XFormRender pRender, P_SystemFn pMemFn);
 
 CLIENT_API ERR_RENDER
-renderCleanup(P_XFormRender pRender);
+renderCleanup(P_XFormRender pRender, P_SystemFn pMemFn);
 
 static ERR_RENDER
-renderParamCheck(P_XFormRender pRender);
+renderParamCheck(P_XFormRender pRender, P_SystemFn pMemFn);
 
 #endif // CSG_CLIENT_RENDER_CONSOLE_RENDER_H
 

@@ -31,15 +31,15 @@ typedef enum {
 } ERR_RENDER;
 
 typedef struct {
-	P_FnMemory pFnMem;
 	RenderBuffer rendData;
 
 	void *hApi;
 	size_t cbApi;
 } XFormRender, *P_XFormRender;
 
-typedef int (*FnRenderInit)(P_XFormRender, P_FnMemory);
-typedef int (*FnRender)(P_XFormRender);
+typedef int (*FnRenderInit)(P_XFormRender, P_SystemFn);
+typedef int (*FnRender)(P_XFormRender, P_SystemFn);
+typedef int (*FnRenderCleanup)(P_XFormRender, P_SystemFn);
 
 #endif // CG_CLIENT_INCLUDE_RENDER_XFORM_RENDER_H
 

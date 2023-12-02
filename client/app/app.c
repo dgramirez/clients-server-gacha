@@ -5,12 +5,12 @@
 
 // DLL Symbol Exports
 CLIENT_API int
-appInit(void* vpAppData, P_FnMemory pFnMem) {
+appInit(void* vpAppData, P_MemoryFn pMemFn) {
 	P_AppData pApp;
 
 	pApp = (P_AppData)vpAppData;
-	pFnMem->memset(pApp->strField1, ' ', MAX_FIELD_INDEX);
-	pFnMem->memset(pApp->strField2, ' ', MAX_FIELD_INDEX);
+	pMemFn->memset(pApp->strField1, ' ', MAX_FIELD_INDEX);
+	pMemFn->memset(pApp->strField2, ' ', MAX_FIELD_INDEX);
 	pApp->ctField1 = 0;
 	pApp->ctField2 = 0;
 
@@ -224,31 +224,31 @@ appLogin(P_AppData pApp) {
 static int
 appRenderLogin(P_AppData pApp,
 		       P_RenderBuffer pRender,
-               P_FnMemory pFnMem)
+               P_MemoryFn pMemFn)
 {
 	const char *p_szMsg;
 
 	if (pApp->hasEscaped) {
-		pFnMem->memset(pRender->bufBack, ' ', pRender->cbBack);
-		pFnMem->memset(pApp->strField2, 0, MAX_FIELD_INDEX);
+		pMemFn->memset(pRender->bufBack, ' ', pRender->cbBack);
+		pMemFn->memset(pApp->strField2, 0, MAX_FIELD_INDEX);
 		pApp->ctField2 = 0;
 	}
 
 	p_szMsg = "Please Log In:";
-	appWriteLine(p_szMsg, 14, pRender, 0, pFnMem);
+	appWriteLine(p_szMsg, 14, pRender, 0, pMemFn);
 
 	p_szMsg = "Username: ";
-	appWriteLine(p_szMsg, 10, pRender, 64, pFnMem);
-	appWriteLine(pApp->strField1, pApp->ctField1, pRender, 74, pFnMem);
+	appWriteLine(p_szMsg, 10, pRender, 64, pMemFn);
+	appWriteLine(pApp->strField1, pApp->ctField1, pRender, 74, pMemFn);
 
 	if (pApp->bAction == 1) {
 		p_szMsg = "Password: ";
-		appWriteLine(p_szMsg, 10, pRender, 128, pFnMem);
+		appWriteLine(p_szMsg, 10, pRender, 128, pMemFn);
 		appWriteLine(pApp->strField2,
 		             pApp->ctField2,
 		             pRender,
 		             138,
-		             pFnMem);
+		             pMemFn);
 	}
 
 	return 0;
@@ -259,7 +259,7 @@ appWriteLine(const char *p_szMsg,
              size_t cbMsg,
 			 P_RenderBuffer pRender,
 			 int iRenderOffset,
-			 P_FnMemory pFnMem)
+			 P_MemoryFn pMemFn)
 {
 	size_t cbLeft;
 
@@ -273,8 +273,8 @@ appWriteLine(const char *p_szMsg,
 	if (cbMsg > cbLeft)
 		return -1;
 
-	pFnMem->memcpy(pRender->bufBack + iRenderOffset, p_szMsg, cbMsg);
-	pFnMem->memset(pRender->bufBack + cbMsg, ' ', cbLeft - cbMsg);
+	pMemFn->memcpy(pRender->bufBack + iRenderOffset, p_szMsg, cbMsg);
+	pMemFn->memset(pRender->bufBack + cbMsg, ' ', cbLeft - cbMsg);
 	return 0;
 }
 

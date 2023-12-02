@@ -3,14 +3,14 @@
 #include <windows.h>
 
 CLIENT_API ERR_RENDER
-renderInit(P_XFormRender pRender) {
+renderInit(P_XFormRender pRender, P_SystemFn pMemFn) {
 	BOOL eWin32;
 	ERR_RENDER eRender;
 	HANDLE hStdOut;
 	CONSOLE_CURSOR_INFO cci;
 	CONSOLE_SCREEN_BUFFER_INFOEX csbi;
 
-	eRender = renderParamCheck(pRender);
+	eRender = renderParamCheck(pRender, pMemFn);
 	if (eRender)
 		return eRender;
 
@@ -33,11 +33,11 @@ renderInit(P_XFormRender pRender) {
 		return E_REND_FAIL_INVALID_BACK_BUFFER_COL_128;
 	}
 
-	pRender->pFnMem->memset(pRender->rendData.bufBack,
+	pMemFn->memset(pRender->rendData.bufBack,
 	                        ' ',
 	                        pRender->rendData.cbBack);
 
-	pRender->pFnMem->memset(pRender->hApi,
+	pMemFn->memset(pRender->hApi,
 	                        ' ',
 	                        pRender->rendData.cbBack);
 
@@ -45,7 +45,7 @@ renderInit(P_XFormRender pRender) {
 	if (hStdOut == INVALID_HANDLE_VALUE)
 		return E_REND_FAIL_GET_STD_OUTPUT_HANDLE;
 
-	pRender->pFnMem->memset(&cci, 0, sizeof(cci));
+	pMemFn->memset(&cci, 0, sizeof(cci));
 	eWin32 = GetConsoleCursorInfo(hStdOut, &cci);
 	if (eWin32 == 0)
 		return E_REND_FAIL_GET_CONSOLE_CURSOR_INFO;
@@ -55,7 +55,7 @@ renderInit(P_XFormRender pRender) {
 	if (eWin32 == 0)
 		return E_REND_FAIL_SET_CONSOLE_CURSOR_INFO;
 
-	pRender->pFnMem->memset(&csbi, 0, sizeof(csbi));
+	pMemFn->memset(&csbi, 0, sizeof(csbi));
 	csbi.cbSize = sizeof(csbi);
 	eWin32 = GetConsoleScreenBufferInfoEx(hStdOut, &csbi);
 	if (eWin32 == 0)
@@ -79,7 +79,7 @@ renderInit(P_XFormRender pRender) {
 }
 
 CLIENT_API int
-render(P_XFormRender pRender) {
+render(P_XFormRender pRender, P_SystemFn pMemFn) {
 	SHORT i;
 	SHORT shLastIndex;
 	BOOL eWin32;
@@ -92,7 +92,7 @@ render(P_XFormRender pRender) {
 	char *bufFront;
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 
-	eRender = renderParamCheck(pRender);
+	eRender = renderParamCheck(pRender, pMemFn);
 	if (eRender)
 		return eRender;
 
@@ -119,9 +119,9 @@ render(P_XFormRender pRender) {
 		if (eWin32 == 0)
 			return E_REND_FAIL_GET_CONSOLE_SCREEN_BUFFER_INFO_PRIOR_WRITE;
 
-		pRender->pFnMem->memset(bufFront,
-		                        ' ',
-		                        pRender->rendData.cbBack);
+		pMemFn->memset(bufFront,
+		               ' ',
+		               pRender->rendData.cbBack);
 
 		bufFront =(char*)((size_t)bufBack ^ (size_t)bufFront);
 		bufBack  =(char*)((size_t)bufBack ^ (size_t)bufFront);
@@ -173,18 +173,18 @@ render(P_XFormRender pRender) {
 }
 
 CLIENT_API int
-renderCleanup(P_XFormRender pRender) {
+renderCleanup(P_XFormRender pRender, P_SystemFn pMemFn) {
 	ERR_RENDER eRender;
 
-	eRender = renderParamCheck(pRender);
+	eRender = renderParamCheck(pRender, pMemFn);
 	if (eRender)
 		return eRender;
 
-	pRender->pFnMem->memset(pRender->rendData.bufBack,
+	pMemFn->memset(pRender->rendData.bufBack,
 	                        0,
 	                        pRender->rendData.cbBack);
 
-	pRender->pFnMem->memset(pRender->hApi,
+	pMemFn->memset(pRender->hApi,
 	                        0,
 	                        pRender->rendData.cbBack);
 
@@ -193,14 +193,14 @@ renderCleanup(P_XFormRender pRender) {
 }
 
 static ERR_RENDER
-renderParamCheck(P_XFormRender pRender) {
+renderParamCheck(P_XFormRender pRender, P_SystemFn pMemFn) {
 	if (!pRender)
 		return E_REND_FAIL_NULL_PARAM_RENDER;
 
-	if (!(pRender->pFnMem))
+	if (!(pMemFn))
 		return E_REND_FAIL_NULL_RENDER_DATA_FN_MEM;
 
-	if (!(pRender->pFnMem->memset))
+	if (!(pMemFn->memset))
 		return E_REND_FAIL_NULL_FN_MEM_MEMSET;
 
 	if (!(pRender->rendData.bufBack))

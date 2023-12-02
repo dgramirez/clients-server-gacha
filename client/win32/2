@@ -14,9 +14,9 @@ WinMain(HINSTANCE hInst,
 	SurfaceBuffer surface;
 	BgThread bgThread;
 	BgEvent bgEvent;
-	HANDLE hBgThread;
+	CRITICAL_SECTION bgCS;
+	CONDITION_VARIABLE bgCV;
 	size_t cbHeap;
-	BgMutex bgMutex;
 
 	// System Functions
 	sysFn.memcpy = win32Memcpy;
@@ -24,14 +24,6 @@ WinMain(HINSTANCE hInst,
 	sysFn.memcmp = win32Memcmp;
 	sysFn.memmove = win32Memmove;
 	sysFn.memzero = win32Memzero;
-
-	win32Memzero(&sysFn, sizeof(SystemFn));
-	win32Memzero(&app, sizeof(AppBuffer));
-	win32Memzero(&inet, sizeof(InetBuffer));
-	win32Memzero(&surface, sizeof(SurfaceBuffer));
-	win32Memzero(&bgThread, sizeof(BgThread));
-	win32Memzero(&bgEvent, sizeof(BgEvent));
-	win32Memzero(&bgMutex, sizeof(BgMutex));
 
 	// Memory
 	cbHeap = KB(4);
@@ -59,32 +51,18 @@ WinMain(HINSTANCE hInst,
 //	getDLLName(&(app.hAppDLL), DLL_APPLICATION);
 
 	// Background Thread
-	InitializeConditionVariable(&(bgMutex.cvEvent));
-	InitializeConditionVariable(&(bgMutex.cvInetSend));
-	InitializeConditionVariable(&(bgMutex.cvInetRecv));
-	InitializeConditionVariable(&(bgMutex.cvInput));
-	InitializeConditionVariable(&(bgMutex.cvRender));
-
-	InitializeCriticalSection(&(bgMutex.csEvent));
-	InitializeCriticalSection(&(bgMutex.csInetSend));
-	InitializeCriticalSection(&(bgMutex.csInetRecv));
-	InitializeCriticalSection(&(bgMutex.csInput));
-	InitializeCriticalSection(&(bgMutex.csRender));
+	InitializeCriticalSection(&bgCS);
+	InitializeConditionVariable(&bgCV);
 
 	bgThread.pInet = &inet;
 	bgThread.pSurf = &surface;
 	bgThread.pSysFn = &sysFn;
 	bgThread.pBgEvent = &bgEvent;
-	bgThread.pBgMutex = &bgMutex;
-	hBgThread = CreateThread(0, 0, threadLoop, &bgThread, 0, 0);
+	bgThread.pBgCS = &bgCS;
+	bgThread.pBgCV = &bgCV;
+	setupBackgroundThread(&bgThread);
 
-	PushEvent(&bgEvent, &bgMutex, BG_EVENT_SURFACE_INIT);
-
-	int run = 1;
-	while (run) {
-		if (run == run+1)
-			break;
-	}
+//	setupSurface(&inet, &surface, &sysFn);
 
 	NO_REF(hInst);
 	NO_REF(hInstPrev);

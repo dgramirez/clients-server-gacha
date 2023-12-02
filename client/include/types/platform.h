@@ -12,7 +12,7 @@
 
 typedef struct {
 	UserBuffer userInput[MAX_USERINPUT];
-	FnMemory memFn;
+	MemoryFn memFn;
 	RenderBuffer render;
 	InetBuffer inet;
 	size_t flags;
@@ -28,7 +28,7 @@ typedef struct {
 //	char *bufMsgRecv;
 } PlatformData, *P_PlatformData;
 
-typedef int (*FnAppInit)(void *, P_FnMemory);
+typedef int (*FnAppInit)(void *, P_MemoryFn);
 typedef int (*FnAppUpdate)(void *, P_PlatformData);
 
 #endif // CSG_CLIENT_PLATFORM_TO_APP_H

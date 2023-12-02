@@ -40,7 +40,7 @@ typedef struct {
 } AppData, *P_AppData;
 
 CLIENT_API int
-appInit(void* vpAppData, P_FnMemory pFnMem);
+appInit(void* vpAppData, P_MemoryFn pMemFn);
 
 CLIENT_API int
 appUpdate(void* vpAppData,
@@ -61,7 +61,7 @@ appLogin(P_AppData pApp);
 static int
 appRenderLogin(P_AppData pApp,
 		       P_RenderBuffer pRender,
-               P_FnMemory pFnMem);
+               P_MemoryFn pMemFn);
 
 // Note: Win32 Console acts so wonky, especially when '\0' is involved.
 //       This is created to avoid such an awful mess with it.
@@ -70,7 +70,7 @@ appWriteLine(const char *p_szMsg,
              size_t cbMsg,
 			 P_RenderBuffer pRender,
 			 int iRenderOffset,
-			 P_FnMemory pFnMem);
+			 P_MemoryFn pMemFn);
 
 #endif // CSG_CLIENT_APP_H
 
