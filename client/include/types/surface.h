@@ -2,6 +2,8 @@
 #define CSG_CLIENT_INCLUDE_TYPES_SURFACE_H
 
 #include "types/system.h"
+#include "types/input.h"
+
 typedef enum {
 	E_SURFACE_SUCCESS = 0,
 	E_SURFACE_FAIL_CREATE_WINDOW = 0x81000000,
@@ -27,21 +29,26 @@ typedef struct {
 typedef int (*FnSurfaceInit)(P_InitSurface, P_SystemFn);
 typedef int (*FnSurfaceUpdate)();
 typedef int (*FnSurfaceShutdown)();
+typedef int (*FnSurfaceInput)(P_MemoryObj bufInput,
+                              P_BufferObj bufTmp,
+                              P_MutexObj pMtxObj,
+                              P_SystemFn pSysFn);
 
 typedef struct {
 	void *hSurfaceDLL;
 	void *hRenderDLL;
 
+	MemoryObj memInput;
+	MutexObj moInput;
+
+	MemoryObj memSurface;
+	MutexObj moSurface;
+
 	void *hProcess;
 	void *hWindow;
 
-	void *bufInput;
-	size_t cbInput;
-
-	void *bufSurface;
-	size_t cbSurface;
-
 	FnSurfaceInit fnInit;
+	FnSurfaceInput fnInput;
 	FnSurfaceUpdate fnUpdate;
 	FnSurfaceShutdown fnShutdown;
 } SurfaceBuffer, *P_SurfaceBuffer;

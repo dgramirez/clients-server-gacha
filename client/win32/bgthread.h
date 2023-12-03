@@ -78,7 +78,7 @@ static BG_EVENTID
 PopEvent(char* aEvent);
 
 static int
-PushEvent(P_BgEvent, P_BgMutex, char);
+PushEvent(P_BgEvent, P_BgMutex, P_SystemFn, char);
 
 static int
 DoEvent(P_BgThread pBgThread, BG_EVENTID evID);
@@ -86,16 +86,6 @@ DoEvent(P_BgThread pBgThread, BG_EVENTID evID);
 // Surface Functions
 static int
 Win32SurfaceInit(P_SurfaceBuffer, P_SystemFn);
-
-// Support Functions
-static int
-Win32TryEnterCriticalSection(CRITICAL_SECTION *pCS,
-                             CONDITION_VARIABLE *pCV,
-                             size_t ctIterationPerMs);
-
-static void
-Win32LeaveCriticalSection(CRITICAL_SECTION *pCS,
-                          CONDITION_VARIABLE *pCV);
 
 #endif // CSG_CLIENT_WIN32_BACKGROUND_THREAD_H
 

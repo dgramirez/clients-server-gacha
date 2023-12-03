@@ -1,4 +1,5 @@
 #include "bgthread.cxx"
+#include "xformfn.cxx"
 #include "main.h"
 #include <windows.h>
 
@@ -27,11 +28,7 @@ WinMain(HINSTANCE hInst,
 	win32Memzero(&bgMutex, sizeof(BgMutex));
 
 	// System Functions
-	sysFn.memcpy = win32Memcpy;
-	sysFn.memset = win32Memset;
-	sysFn.memcmp = win32Memcmp;
-	sysFn.memmove = win32Memmove;
-	sysFn.memzero = win32Memzero;
+	win32InitFn(&sysFn);
 
 	// Memory
 	cbHeap = KB(4);
@@ -46,11 +43,12 @@ WinMain(HINSTANCE hInst,
 	inet.cbMsgRecv = 256;
 	inet.bufMsgRecv = (char*)(inet.bufMsgSend) + inet.cbMsgSend;
 
-	surface.cbInput = 256;
-	surface.bufInput = (char*)(inet.bufMsgRecv) + inet.cbMsgRecv;
+	surface.memInput.cbAddr = 256;
+	surface.memInput.vpAddr = (char*)(inet.bufMsgRecv) + inet.cbMsgRecv;
 
-	surface.cbSurface = KB(3);
-	surface.bufSurface = (char*)(surface.bufInput) + surface.cbInput;
+	surface.memSurface.cbAddr = KB(3);
+	surface.memSurface.vpAddr = (char*)(surface.memInput.vpAddr) + 
+	                            surface.memInput.cbAddr;
 
 	// DLL Setup
 	getDLLName(&(surface.hSurfaceDLL), DLL_SURFACE);
@@ -78,7 +76,7 @@ WinMain(HINSTANCE hInst,
 	bgThread.pBgMutex = &bgMutex;
 	hBgThread = CreateThread(0, 0, threadLoop, &bgThread, 0, 0);
 
-	PushEvent(&bgEvent, &bgMutex, BG_EVENT_SURFACE_INIT);
+	PushEvent(&bgEvent, &bgMutex, &sysFn, BG_EVENT_SURFACE_INIT);
 
 	int run = 1;
 	while (run) {
@@ -113,57 +111,5 @@ getDLLName(void **p_hOut, DLL_ID id) {
 	}
 
 	return (*p_hOut == 0) ? -1 : 0;
-}
-
-//static int
-//setupSurface(P_InetBuffer pInet,
-//             P_SurfaceBuffer pSurf,
-//             P_SystemFn pSysFn)
-//{
-//	E_SURFACE eSurface;
-//	FnSurfaceInit p_fnSurfaceInit;
-//	// TODO: Setup Inet DLL
-//
-//	pSurf->hSurfaceDLL = LoadLibraryA(pSurf->szSurfaceDLL);
-//	if (pSurf->hSurfaceDLL == NULL)
-//		return 1;
-//
-//	p_fnSurfaceInit = (FnSurfaceInit)GetProcAddress(pSurf->hSurfaceDLL,
-//	                                                "surfaceInit");
-//	if (!p_fnSurfaceInit)
-//		return 2;
-//
-//	eSurface = p_fnSurfaceInit(pSurf, pSysFn);
-//	if (eSurface != ERR_SURFACE_SUCCESS)
-//		return eSurface;
-//
-//	NO_REF(pInet);
-//
-//	return 0;
-//}
-
-static void
-win32Memcpy(void *dst, const void *src, size_t size) {
-	RtlCopyMemory(dst, src, size);
-}
-
-static void
-win32Memset(void *dst, int value, size_t size) {
-	RtlFillMemory(dst, size, value);
-}
-
-static void
-win32Memzero(void *dst, size_t size) {
-	ZeroMemory(dst, size);
-}
-
-static void
-win32Memmove(void *dst, const void *src, size_t size) {
-	RtlMoveMemory(dst, src, size);
-}
-
-static size_t
-win32Memcmp(const void *m1, const void *m2, size_t size) {
-	return RtlCompareMemory(m1, m2, size);
 }
 

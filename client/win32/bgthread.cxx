@@ -7,15 +7,28 @@ static DWORD
 threadLoop(void *arg) {
 	P_BgThread pXData;
 	size_t fChk;
+	MutexObj mtxObj;
+
+	INPUT_RECORD ir[4];
+	BufferObj bufTmp;
 
 	pXData = (P_BgThread)arg;
+	mtxObj.vpMtx = &(pXData->pBgMutex->csInput);
+	mtxObj.vpCV = &(pXData->pBgMutex->cvInput);
 	fChk = 0;
+
+	bufTmp.vpAddr = &ir;
+	bufTmp.cbAddr = sizeof(ir);
 
 	while (1) {
 		DoBatchedEvents(pXData, pXData->pBgEvent, pXData->pBgMutex);
 		if (HAS_FLG(fChk, BG_FLAG_QUIT))
 			break;
 
+		pXData->pSurf->fnInput(&(pXData->pSurf->memInput),
+		                       &bufTmp,
+		                       &mtxObj,
+		                       pXData->pSysFn);
 //		DoInputEvents();
 //		DoRenderEvents();
 
@@ -52,22 +65,22 @@ DoBatchedEvents(P_BgThread pXData,
 	BG_EVENTID evID;
 
 	for (i = 0; i < 16; ++i) {
-		hasThread = Win32TryEnterCriticalSection(&(pBgMutex->csEvent),
-		                                         &(pBgMutex->cvEvent),
-												 1);
+		hasThread = pXData->pSysFn->mtx_lock(&(pBgMutex->csEvent),
+		                                     &(pBgMutex->cvEvent),
+		                                     1);
 		if (!hasThread)
 			break;
 
 		if (pBgEvent->aEvent[0] == BG_EVENT_NONE) {
-			Win32LeaveCriticalSection(&(pBgMutex->csEvent),
-			                          &(pBgMutex->cvEvent));
+			pXData->pSysFn->mtx_unlock(&(pBgMutex->csEvent),
+			                           &(pBgMutex->cvEvent));
 			break;
 		}
 
 		evID = PopEvent(pBgEvent->aEvent);
 		pBgEvent->ctEvent -= 1;
-		Win32LeaveCriticalSection(&(pBgMutex->csEvent),
-                                  &(pBgMutex->cvEvent));
+		pXData->pSysFn->mtx_unlock(&(pBgMutex->csEvent),
+                                   &(pBgMutex->cvEvent));
 
 		DoEvent(pXData, evID);
 	}
@@ -91,51 +104,21 @@ PopEvent(char *aEvent) {
 }
 
 static int
-PushEvent(P_BgEvent pBgEvent, P_BgMutex pBgMutex, char value) {
+PushEvent(P_BgEvent pBgEvent,
+          P_BgMutex pBgMutex,
+          P_SystemFn pSysFn,
+          char value)
+{
 	int hasThread;
-	hasThread = Win32TryEnterCriticalSection(&(pBgMutex->csEvent),
-	                                         &(pBgMutex->cvEvent),
-	                                         2);
+	hasThread = pSysFn->mtx_lock(&(pBgMutex->csEvent),
+	                             &(pBgMutex->cvEvent),
+	                             2);
 	if (!hasThread)
 		return -1;
 
 	pBgEvent->aEvent[(pBgEvent->ctEvent)++] = value;
-	Win32LeaveCriticalSection(&(pBgMutex->csEvent), &(pBgMutex->cvEvent));
+	pSysFn->mtx_unlock(&(pBgMutex->csEvent), &(pBgMutex->cvEvent));
 	return 0;
-}
-
-static int
-Win32TryEnterCriticalSection(CRITICAL_SECTION *pCS,
-                             CONDITION_VARIABLE *pCV,
-                             size_t ctIterationPerMs)
-{
-	int i;
-	BOOL eTimedCS;
-	CRITICAL_SECTION tryCS;
-
-	i = -1;
-	InitializeCriticalSection(&tryCS);
-	do {
-		eTimedCS = TryEnterCriticalSection(pCS);
-		if (eTimedCS)
-			break;
-
-		if (++i >= ctIterationPerMs)
-			break;
-
-		SleepConditionVariableCS(pCV, &tryCS, 1);
-	} while(1);
-	DeleteCriticalSection(&tryCS);
-
-	return (eTimedCS > 0);
-}
-
-static void
-Win32LeaveCriticalSection(CRITICAL_SECTION *pCS,
-                          CONDITION_VARIABLE *pCV)
-{
-	LeaveCriticalSection(pCS);
-	WakeConditionVariable(pCV);
 }
 
 static int
@@ -161,6 +144,11 @@ Win32SurfaceInit(P_SurfaceBuffer pSurf, P_SystemFn pSysFn) {
 		"expSurfaceShutdown");
 
 	if (!pSurf->fnShutdown)
+		return 5;
+
+	pSurf->fnInput = (FnSurfaceInput)GetProcAddress(pSurf->hSurfaceDLL,
+	                                                "expSurfaceInput");
+	if (!pSurf->fnInput)
 		return 4;
 
 	// TODO: Get Surface Configuration

@@ -25,8 +25,8 @@ typedef enum {
 } USERINPUT_EVENT_KEYS;
 
 typedef struct {
-	uint8_t eventType;
-	uint8_t eventKey;
+	uint32_t eventType;
+	uint32_t eventKey;
 } UserBuffer, *P_UserBuffer;
 
 #endif // CSG_CLIENT_INCLUDE_TYPES_INPUT_H

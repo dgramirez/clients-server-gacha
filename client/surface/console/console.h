@@ -2,6 +2,7 @@
 #define CSG_CLIENT_SURFACE_CONSOLE_CONSOLE_H
 
 #include "types/surface.h"
+#include "types/system.h"
 #include <windows.h>
 
 CLIENT_API int
@@ -12,6 +13,9 @@ surfaceRender(void *bufBack, P_SurfaceBuffer pSurf, P_SystemFn pSysFn);
 
 CLIENT_API int
 surfaceCleanup(P_SurfaceBuffer pSurf, P_SystemFn pSysFn);
+
+static int
+inputPop(P_MemoryObj pMem, P_SystemFn pSysFn);
 
 #endif // CSG_CLIENT_SURFACE_CONSOLE_CONSOLE_H
 
